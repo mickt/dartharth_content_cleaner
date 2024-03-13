@@ -1,0 +1,7 @@
+dartharth_content_cleaner.admin_settings:
+  path: '/admin/config/dartharth-content-cleaner'
+  defaults:
+    _form: '\Drupal\dartharth_content_cleaner\Form\ContentCleanerSettingsForm'
+    _title: 'DARTHARTH Content Cleaner Settings'
+  requirements:
+    _permission: 'administer site configuration'
