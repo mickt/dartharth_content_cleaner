@@ -5,6 +5,7 @@ namespace Drupal\dartharth_content_cleaner\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\filter\Entity\FilterFormat;
 
 
 class ContentCleanerSettingsForm extends ConfigFormBase {
@@ -20,23 +21,42 @@ class ContentCleanerSettingsForm extends ConfigFormBase {
     public function buildForm(array $form, FormStateInterface $form_state) {
         // Get a list of content types.
         $content_types = \Drupal::entityTypeManager()->getStorage('node_type')->loadMultiple();
-        $options = [];
+        $content_type_options = [];
         foreach ($content_types as $content_type) {
-            $options[$content_type->id()] = $content_type->label();
+            $content_type_options[$content_type->id()] = $content_type->label();
         }
 
+        // Add content type select element.
         $form['content_type'] = [
             '#type' => 'select',
             '#title' => $this->t('Content type'),
-            '#options' => $options,
+            '#options' => $content_type_options,
             '#required' => TRUE,
         ];
 
+        // Get a list of text formats.
+        $text_formats = FilterFormat::loadMultiple();
+        $text_format_options = [];
+        foreach ($text_formats as $text_format) {
+            $text_format_options[$text_format->id()] = $text_format->label();
+        }
+
+        // Add text format select element.
+        $form['text_format'] = [
+            '#type' => 'select',
+            '#title' => $this->t('Text format'),
+            '#options' => $text_format_options,
+            '#required' => TRUE,
+            '#description' => $this->t('Select the text format for the cleaned content.'),
+        ];
+
+        // Add cleaning options fieldset.
         $form['cleaning_options'] = [
             '#type' => 'fieldset',
             '#title' => $this->t('Cleaning options'),
         ];
 
+        // Add cleaning option checkboxes.
         $form['cleaning_options']['remove_scripts'] = [
             '#type' => 'checkbox',
             '#title' => $this->t('Remove scripts'),
@@ -52,6 +72,7 @@ class ContentCleanerSettingsForm extends ConfigFormBase {
             '#title' => $this->t('Remove images'),
         ];
 
+        // Add submit button.
         $form['submit'] = [
             '#type' => 'submit',
             '#value' => $this->t('Start cleaning'),
@@ -66,6 +87,7 @@ class ContentCleanerSettingsForm extends ConfigFormBase {
         $remove_scripts = $form_state->getValue('remove_scripts');
         $remove_links = $form_state->getValue('remove_links');
         $remove_images = $form_state->getValue('remove_images');
+        $content_filter = $form_state->getValue('text_format');
 
         // Get the list of nodes of the selected content type.
         $query = \Drupal::entityQuery('node')->condition('type', $content_type);
@@ -84,7 +106,7 @@ class ContentCleanerSettingsForm extends ConfigFormBase {
                 $body_value_cleaned = $this->cleanUpHtml($body_value, $remove_scripts, $remove_links, $remove_images);
                 $node->set('body', [
                     'value' => $body_value_cleaned,
-                    'format' => 'html', // Встановлюємо кастомний фільтр "html".
+                    'format' => $content_filter,
                 ]);
 
                 // Save the node.
@@ -122,5 +144,6 @@ class ContentCleanerSettingsForm extends ConfigFormBase {
 
         return $html;
     }
+
 
 }
