@@ -1,0 +1,7 @@
+name: 'Content Cleaner'
+type: module
+description: 'Provides a tool to clean HTML content of specified content types.'
+core_version_requirement: ^9
+package: DARTHARTH
+dependencies:
+  - drupal:node
