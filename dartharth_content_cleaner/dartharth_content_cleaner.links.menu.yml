@@ -1,0 +1,6 @@
+dartharth_content_cleaner.admin_settings:
+  title: 'DARTHARTH Content Cleaner Settings'
+  description: 'Configure content cleaning options.'
+  parent: system.admin_config_content
+  route_name: dartharth_content_cleaner.admin_settings
+  weight: 10
